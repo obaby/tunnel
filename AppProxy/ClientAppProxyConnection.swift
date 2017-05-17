@@ -61,7 +61,7 @@ class ClientAppProxyConnection : Connection {
 	}
 
 	/// Handle errors that occur on the connection.
-	func handleErrorCondition(_ flowError: NEAppProxyErrorDomain? = nil, notifyServer: Bool = true) {
+	func handleErrorCondition(_ flowError: NEAppProxyFlowError.Code? = nil, notifyServer: Bool = true) {
 
 		guard !isClosedCompletely else { return }
 
@@ -121,7 +121,7 @@ class ClientAppProxyConnection : Connection {
 		self.closeConnection(direction, flowError: nil)
 	}
 
-	func closeConnection(_ direction: TunnelConnectionCloseDirection, flowError: NEAppProxyErrorDomain?) {
+	func closeConnection(_ direction: TunnelConnectionCloseDirection, flowError: NEAppProxyFlowError.Code?) {
 		super.closeConnection(direction)
 
 		var error: NSError?
