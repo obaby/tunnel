@@ -27,7 +27,7 @@ signal(SIGINT, ignore)
 
 let portString = Process.arguments[1]
 let configurationPath = Process.arguments[2]
-let networkService: NSNetService
+let networkService: NetService
 
 // Initialize the server.
 
