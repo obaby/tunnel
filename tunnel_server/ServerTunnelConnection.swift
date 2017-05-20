@@ -78,7 +78,7 @@ class ServerTunnelConnection: Connection {
 		response[TunnelMessageKey.Configuration.rawValue] = personalized as AnyObject
 
 		// Send the personalized configuration along with the "open result" message.
-		sendOpenResult(result: .Success, extraProperties: response)
+		sendOpenResult(result: .success, extraProperties: response)
 
 		return true
 	}
@@ -208,7 +208,7 @@ class ServerTunnelConnection: Connection {
 	/// Abort the connection.
 	override func abort(_ error: Int = 0) {
 		super.abort(error)
-		closeConnection(direction: .All)
+		closeConnection(.all)
 	}
 
 	/// Close the connection.
@@ -254,8 +254,8 @@ class ServerTunnelConnection: Connection {
 
 			var protocolNumber = protocols[index].uint32Value.bigEndian
 
-			let buffer = UnsafeMutableRawPointer(packet.bytes)
-			var iovecList = [ iovec(iov_base: &protocolNumber, iov_len: sizeofValue(protocolNumber)), iovec(iov_base: buffer, iov_len: packet.length) ]
+			let buffer = UnsafeMutableRawPointer(mutating: packet.bytes)
+			var iovecList = [ iovec(iov_base: &protocolNumber, iov_len: MemoryLayout.size(ofValue: protocolNumber)), iovec(iov_base: buffer, iov_len: packet.length) ]
 
 			let writeCount = writev(utunSocket, &iovecList, Int32(iovecList.count))
 			if writeCount < 0 {

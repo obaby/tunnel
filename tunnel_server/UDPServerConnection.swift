@@ -36,21 +36,21 @@ class UDPServerConnection: Connection {
 
 	/// Convert a sockaddr structure into an IP address string and port.
     func getEndpointFromSocketAddress(socketAddressPointer: UnsafePointer<sockaddr>) -> (host: String, port: Int)? {
-		let socketAddress = UnsafePointer<sockaddr>(socketAddressPointer).memory
+		let socketAddress = UnsafePointer<sockaddr>(socketAddressPointer).pointee
 
 		switch Int32(socketAddress.sa_family) {
 			case AF_INET:
-				var socketAddressInet = UnsafePointer<sockaddr_in>(socketAddressPointer).memory
+				var socketAddressInet = UnsafePointer<sockaddr_in>(socketAddressPointer).pointee
 				let length = Int(INET_ADDRSTRLEN) + 2
-				var buffer = [CChar](count: length, repeatedValue: 0)
+				var buffer = [CChar](repeating: 0, count: length)
 				let hostCString = inet_ntop(AF_INET, &socketAddressInet.sin_addr, &buffer, socklen_t(length))
 				let port = Int(UInt16(socketAddressInet.sin_port).byteSwapped)
 				return (String.fromCString(hostCString)!, port)
 
 			case AF_INET6:
-				var socketAddressInet6 = UnsafePointer<sockaddr_in6>(socketAddressPointer).memory
+				var socketAddressInet6 = UnsafePointer<sockaddr_in6>(socketAddressPointer).pointee
 				let length = Int(INET6_ADDRSTRLEN) + 2
-				var buffer = [CChar](count: length, repeatedValue: 0)
+				var buffer = [CChar](repeatedValue: 0, count: length)
 				let hostCString = inet_ntop(AF_INET6, &socketAddressInet6.sin6_addr, &buffer, socklen_t(length))
 				let port = Int(UInt16(socketAddressInet6.sin6_port).byteSwapped)
 				return (String.fromCString(hostCString)!, port)
@@ -137,7 +137,7 @@ class UDPServerConnection: Connection {
     override func sendDataWithEndPoint(data: NSData, host: String, port: Int) {
 
 		if responseSource == nil {
-			guard createSocketWithAddressFamilyFromAddress(host) else {
+			guard createSocketWithAddressFamilyFromAddress(address: host) else {
 				simpleTunnelLog("UDP ServerConnection initialization failed.")
 				return
 			}
@@ -180,7 +180,7 @@ class UDPServerConnection: Connection {
 			if let errorString = String(UTF8String: strerror(errno)) {
 				simpleTunnelLog("UDP connection id \(identifier) failed to send data to host = \(host) port \(port). error = \(errorString)")
 			}
-			closeConnection(.All)
+			closeConnection(direction: .All)
 			return
 		}
 
@@ -191,10 +191,10 @@ class UDPServerConnection: Connection {
     }
 
 	/// Close the connection.
-	override func closeConnection(direction: TunnelConnectionCloseDirection) {
+	override func closeConnection(_ direction: TunnelConnectionCloseDirection) {
 		super.closeConnection(direction)
 
-		if let source = responseSource where isClosedForWrite && isClosedForRead {
+		if let source = responseSource, isClosedForWrite && isClosedForRead {
 			dispatch_source_cancel(source)
 			responseSource = nil
 		}

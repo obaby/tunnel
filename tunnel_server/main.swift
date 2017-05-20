@@ -57,4 +57,4 @@ dispatch_source_set_event_handler(termSignalSource) {
 }
 dispatch_resume(termSignalSource)
 
-NSRunLoop.mainRunLoop().run()
+RunLoop.mainRunLoop().run()

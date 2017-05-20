@@ -156,7 +156,7 @@ class ServerConnection: Connection, StreamDelegate {
 					case [.hasBytesAvailable]:
 						if let stream = readStream {
 							while stream.hasBytesAvailable {
-								var readBuffer = [UInt8](repeatedValue: 0, count: 8192)
+								var readBuffer = [UInt8](repeating: 0, count: 8192)
 								let bytesRead = stream.read(&readBuffer, maxLength: readBuffer.count)
 
 								if bytesRead < 0 {
@@ -172,7 +172,7 @@ class ServerConnection: Connection, StreamDelegate {
 								}
 
 								let readData = NSData(bytes: readBuffer, length: bytesRead)
-								tunnel?.sendData(readData, forConnection: identifier)
+								tunnel?.sendData(readData as Data, forConnection: identifier)
 							}
 						}
 
@@ -189,7 +189,7 @@ class ServerConnection: Connection, StreamDelegate {
 
 					case [.openCompleted]:
 						if let serverTunnel = tunnel as? ServerTunnel {
-							serverTunnel.sendOpenResultForConnection(connectionIdentifier: identifier, resultCode: .Success)
+							serverTunnel.sendOpenResultForConnection(connectionIdentifier: identifier, resultCode: .success)
 						}
 
 					default:

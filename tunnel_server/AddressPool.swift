@@ -29,7 +29,7 @@ class AddressPool {
 	
 	init(startAddress: String, endAddress: String) {
 		baseAddress = SocketAddress()
-		inUseMask = [Bool](count: 0, repeatedValue: false)
+		inUseMask = [Bool](repeating: false, count: 0)
 		queue = dispatch_queue_create("AddressPoolQueue", nil)
 
 		let start = SocketAddress()
@@ -59,7 +59,7 @@ class AddressPool {
 
 		baseAddress.sin = start.sin
 		size = UInt64(difference)
-		inUseMask = [Bool](count: Int(size), repeatedValue: false)
+		inUseMask = [Bool](repeating: false, count: Int(size))
 	}
 
 	/// Allocate an address from the pool.
