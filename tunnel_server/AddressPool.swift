@@ -23,14 +23,14 @@ class AddressPool {
 	var inUseMask: [Bool]
 
 	/// A dispatch queue for serializing access to the pool.
-	let queue: dispatch_queue_t
+	let queue: DispatchQueue
 
-	// MARK: Initializers
+    // MARK: Initializers
 	
 	init(startAddress: String, endAddress: String) {
 		baseAddress = SocketAddress()
 		inUseMask = [Bool](repeating: false, count: 0)
-		queue = dispatch_queue_create("AddressPoolQueue", nil)
+        queue = DispatchQueue(label: "queuename")
 
 		let start = SocketAddress()
 		let end = SocketAddress()

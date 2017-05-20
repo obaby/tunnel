@@ -45,12 +45,12 @@ class UDPServerConnection: Connection {
 				var buffer = [CChar](repeating: 0, count: length)
 				let hostCString = inet_ntop(AF_INET, &socketAddressInet.sin_addr, &buffer, socklen_t(length))
 				let port = Int(UInt16(socketAddressInet.sin_port).byteSwapped)
-				return (String.fromCString(hostCString)!, port)
+				return (String.fromCString(hostCString!)!, port)
 
 			case AF_INET6:
 				var socketAddressInet6 = UnsafePointer<sockaddr_in6>(socketAddressPointer).pointee
 				let length = Int(INET6_ADDRSTRLEN) + 2
-				var buffer = [CChar](repeatedValue: 0, count: length)
+				var buffer = [CChar](repeating: 0, count: length)
 				let hostCString = inet_ntop(AF_INET6, &socketAddressInet6.sin6_addr, &buffer, socklen_t(length))
 				let port = Int(UInt16(socketAddressInet6.sin6_port).byteSwapped)
 				return (String.fromCString(hostCString)!, port)
@@ -180,7 +180,7 @@ class UDPServerConnection: Connection {
 			if let errorString = String(UTF8String: strerror(errno)) {
 				simpleTunnelLog("UDP connection id \(identifier) failed to send data to host = \(host) port \(port). error = \(errorString)")
 			}
-			closeConnection(direction: .All)
+			closeConnection(.all)
 			return
 		}
 

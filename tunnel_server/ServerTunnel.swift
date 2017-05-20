@@ -144,32 +144,32 @@ class ServerTunnel: Tunnel, TunnelDelegate, StreamDelegate {
 			else { return }
 
 		switch tunnelLayer {
-			case .App:
+			case .app:
 
 				guard let flowKindNumber = properties[TunnelMessageKey.AppProxyFlowType.rawValue] as? Int,
 					let flowKind = AppProxyFlowKind(rawValue: flowKindNumber)
 					else { break }
 
 				switch flowKind {
-					case .TCP:
+					case .tcp:
 						guard let host = properties[TunnelMessageKey.Host.rawValue] as? String,
 							let port = properties[TunnelMessageKey.Port.rawValue] as? NSNumber
 							else { break }
 						let newConnection = ServerConnection(connectionIdentifier: connectionIdentifier, parentTunnel: self)
 						guard newConnection.open(host: host, port: port.intValue) else {
-							newConnection.closeConnection(direction: .all)
+							newConnection.closeConnection(.all)
 							break
 						}
 
-					case .UDP:
+					case .udp:
 						let _ = UDPServerConnection(connectionIdentifier: connectionIdentifier, parentTunnel: self)
 						sendOpenResultForConnection(connectionIdentifier: connectionIdentifier, resultCode: .success)
 				}
 
-			case .IP:
+			case .ip:
 				let newConnection = ServerTunnelConnection(connectionIdentifier: connectionIdentifier, parentTunnel: self)
 				guard newConnection.open() else {
-					newConnection.closeConnection(direction: .all)
+					newConnection.closeConnection(.all)
 					break
 				}
 		}
@@ -274,10 +274,10 @@ class ServerTunnel: Tunnel, TunnelDelegate, StreamDelegate {
 	/// Handle a message received from the client.
 	override func handleMessage(_ commandType: TunnelCommand, properties: [String: AnyObject], connection: Connection?) -> Bool {
 		switch commandType {
-			case .Open:
+			case .open:
 				handleConnectionOpen(properties: properties)
 
-			case .FetchConfiguration:
+			case .fetchConfiguration:
 				var personalized = ServerTunnel.configuration.configuration
 				personalized.removeValue(forKey: SettingsKey.IPv4.rawValue)
 				let messageProperties = createMessagePropertiesForConnection(0, commandType: .fetchConfiguration, extraProperties: [TunnelMessageKey.Configuration.rawValue: personalized as AnyObject])
